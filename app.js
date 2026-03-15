@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var swaggerJsdoc = require("swagger-jsdoc");
+var swaggerUi = require("swagger-ui-express");
 
 var indexRouter = require('./routes/index');
 var bicicletasAPIRouter = require('./routes/api/bicicletas');
@@ -25,6 +27,34 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 app.use('/api/bicicletas', bicicletasAPIRouter); 
+
+const options = {
+  definition: {
+    openapi: "3.1.0",
+    info: {
+      title: "API REST Bicicletas",
+      version: "1.0.0",
+      description: "Documentacion de la API REST de bicicletas",
+      contact: {
+        name: "Arthur",
+      },
+    },
+    servers: [
+      {
+        url: "http://localhost:3000",
+      },
+    ],
+  },
+  apis: ["./routes/api/*.js"],
+};
+
+const specs = swaggerJsdoc(options);
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
